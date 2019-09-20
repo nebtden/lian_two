@@ -1,23 +1,6 @@
-@extends('layouts.app')
+@extends('layouts.client')
 
 @section('content')
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="card card-danger">
-                    <div class="card-header">
-                        <h3 class="card-title">公告！</h3>
-                        <!-- /.card-tools -->
-                    </div>
-                    <!-- /.card-header -->
-                    <div class="card-body">
-                        {{ $settings['login_notice'] }}
-                    </div>
-                    <!-- /.card-body -->
-                </div>
-            </div>
-        </div>
-    </div>
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-8">
@@ -59,10 +42,10 @@
                             <div class="form-group row">
                                 <div class="col-md-6 offset-md-4">
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="remember" id="remember" checked>
+                                        <input class="form-check-input" type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>
 
                                         <label class="form-check-label" for="remember">
-                                            记住我
+                                            {{ __('Remember Me') }}
                                         </label>
                                     </div>
                                 </div>
@@ -74,11 +57,7 @@
                                         {{ __('Login') }}
                                     </button>
 
-                                    @if (Route::has('password.request'))
-                                        <a class="btn btn-link" href="{{ route('password.request') }}">
-                                            忘记密码？
-                                        </a>
-                                    @endif
+
                                 </div>
                             </div>
                         </form>

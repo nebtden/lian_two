@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Setting;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Http\Request;
 
 class LoginController extends Controller
 {
@@ -27,6 +29,22 @@ class LoginController extends Controller
      */
     protected $redirectTo = '/home';
 
+    public function username()
+    {
+        return 'phone';
+    }
+
+
+
+    public function showLoginForm()
+    {
+        $settings = Setting::all()->pluck('value','key');
+
+        return view('auth.login',[
+            'settings'=>$settings,
+        ]);
+    }
+
     /**
      * Create a new controller instance.
      *
@@ -36,4 +54,18 @@ class LoginController extends Controller
     {
         $this->middleware('guest')->except('logout');
     }
+
+    protected function credentials(Request $request)
+    {
+        $phone = $request->get('phone');
+        $password = $request->get('password');
+        return ['phone' => $phone, 'password' => $password];
+    }
+
+    function authenticated(Request $request, $user)
+    {
+        $user->ip = $request->ip();
+        $user->save();
+    }
+
 }
