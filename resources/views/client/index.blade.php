@@ -14,19 +14,6 @@
                 <div class="card-header">
                     <h3 class="card-title">客户信息</h3>
                     <div class="card-tools">
-                        <a href="/user/client/upload" class=" " title="批量上传">
-                            <i class="fa fa-plus"></i>
-                            <span class="hidden-xs" style="font-size: larger">&nbsp;&nbsp;批量上传
-                                </span>
-                        </a>
-
-                        <a href="/user/client/create" class=" " title="新增">
-                            <i class="fa fa-plus"></i>
-                            <span class="hidden-xs" style="font-size: larger">&nbsp;&nbsp;新增
-                                </span>
-                        </a>
-
-
 
                     </div>
                 </div>
@@ -46,20 +33,12 @@
                                 <table id="client_index" class="table table-bordered table-hover" role="grid" >
                                     <thead>
                                     <tr role="row">
-                                        <th >ID
-                                        </th>
-                                        <th  >姓名
-                                        </th>
-                                        <th >手机号码
-                                        </th>
-                                        <th
-                                        >状态
-                                        </th>
-                                        <th  >创建时间
-                                        </th>
-                                        <th
-                                        >操作
-                                        </th>
+                                        <th>ID</th>
+                                        <th>姓名</th>
+                                        <th>手机号码 </th>
+                                        <th>状态</th>
+                                        <th>创建时间</th>
+                                        <th>操作</th>
                                     </tr>
                                     </thead>
                                     <tbody>

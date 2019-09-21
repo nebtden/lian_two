@@ -31,10 +31,6 @@ class Client extends Model
         2=>'订单完成',
     ];
 
-//    @todo simon.zhang
-//    public static $from = [
-//        1=>'用户'
-//    ];
 
     public function  rules(){
 
