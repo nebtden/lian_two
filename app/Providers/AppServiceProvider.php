@@ -14,6 +14,7 @@ class AppServiceProvider extends ServiceProvider
     public function register()
     {
         //
+        app('view')->prependNamespace('admin', resource_path('views/admin'));
     }
 
     /**
