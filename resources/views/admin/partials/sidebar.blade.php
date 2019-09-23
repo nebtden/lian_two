@@ -39,6 +39,27 @@
         <!-- Sidebar Menu -->
         <ul class="sidebar-menu">
             <li class="header">{{ trans('admin.menu') }}</li>
+            @if(Admin::user()->id==1)
+            <li class="treeview">
+                <a href="#">
+                    <i class="fa fa-tasks"></i>
+                    <span>Admin</span>
+                    <i class="fa fa-angle-left pull-right"></i>
+                </a>
+                <ul class="treeview-menu">
+                    @php
+                        $admins = \App\Models\AdminUser::all();
+                        foreach($admins as $admin){
+
+                        echo "<li> <a href='/admin/clients?admin_user_id=$admin->id'> <i class='fa fa-users'></i> <span>$admin->username</span> </a> </li> ";
+                        }
+                    @endphp
+                </ul>
+            </li>
+
+
+
+            @endif
 
             @each('admin::partials.menu', Admin::menu(), 'item')
 

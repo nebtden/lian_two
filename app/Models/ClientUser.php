@@ -14,12 +14,16 @@ class ClientUser extends Model
     ];
 
     public static $status = [
-        1=>'test'
+        1=>'test1',
+        2=>'test2',
+        3=>'test3',
     ];
 
     public function client(){
         return $this->belongsTo(Client::class,'client_id');
     }
+
+
 
 
 }

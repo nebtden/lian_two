@@ -37,13 +37,12 @@ class ClientController extends Controller
         $clients =  ClientUser::where(
             $where
         )->with('client')->orderBy('id','desc')->paginate(7);
-//        dd($clients);
 
         $total = ClientUser::where(
             $where
         )->count();
         $status = ClientUser::$status;
-//        dd($status);
+
 
 
         return view('client.index',[
@@ -56,42 +55,35 @@ class ClientController extends Controller
 
 
 
-    public function update(Request $request){
 
-        $id = $request->get('id');
-        $client = Client::findOrFail($id);
-        $user = Auth::user();
-
-        $client->user_name = $request->input('user_name');
-        $client->user_id = $user->id;
-        $client->remark = $request->input('remark');
-        $client->save();
-        $id = $client->id;
-        $request->session()->flash('setting_status', '您的数据已更新，
-        感谢您的信任与支持!实现成交后，工作人员将联系您');
-
-        return   redirect('/user/client/'.$id.'/edit');
-    }
-
-    public function upload(Request $request){
-
-        return view('client.upload',[
-
-        ]);
-    }
 
     public function accept(Request $request){
+        $return = [
+            'status'=>1,
+            'data'=>[],
+        ];
+
         $id = $request->get('id');
 
         //更新时间
 
-        $client =  Client::findOrFail($id);
-        if($client){
+        $client_user =  ClientUser::findOrFail($id);
+        if($client_user){
             //更新接收时间
-            $client->status = 1;
+            $client_user->status = 1;
+            $client_user->accept_at = date('Y-m-d H:i:s',time());
+            $client_user->save();
 
+            $client = Client::find($client_user->client_id);
+
+            $return['phone']=$client->phone;
+
+            //返回手机信息
+        }else{
+            $return['status']=0;
         }
-        //return \Illuminate\Http\Response::wi
+        return response()->json($return);
+
     }
 
     public function saveFive(Request $request){

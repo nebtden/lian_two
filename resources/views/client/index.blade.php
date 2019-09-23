@@ -46,10 +46,12 @@
                                         <tr role="row" class="odd">
 
                                             <td>{{$client->client->user_name}}</td>
-                                            <td>{{$client->client->phone}}</td>
+                                            <td class="phone">{{\App\Logic\Lian::HandleClientPhone($client)}}</td>
                                             <td>{{$status[$client->status]}}</td>
                                             <td>{{$client->created_at}}</td>
-                                            <td><a href="{{ url('/user/client/'.$client->id.'/edit') }}">编辑</a></td>
+                                            <td>
+                                                <a class="client_accept" data-id="{{$client->id}}">接收</a>
+                                                <a href="{{ url('/user/client/'.$client->id.'/edit') }}">编辑</a></td>
                                         </tr>
                                     @endforeach
 
@@ -90,7 +92,7 @@
 @stop
 
 @section('js')
-
+    <script src="/js/lian/accept.js"></script>
     <script>
         $('#client_index').DataTable({
             "bPaginate": false,
