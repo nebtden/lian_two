@@ -13,10 +13,13 @@ class ClientUser extends Model
         'client_id', 'user_id','status',
     ];
 
+    public static $status = [
+        1=>'test'
+    ];
 
-
-
-
+    public function client(){
+        return $this->belongsTo(Client::class,'client_id');
+    }
 
 
 }

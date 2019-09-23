@@ -36,11 +36,15 @@ class ClientController extends Controller
         $where['user_id'] = $user_id;
         $clients =  ClientUser::where(
             $where
-        )->with('user')->orderBy('id','desc')->paginate(7);
+        )->with('client')->orderBy('id','desc')->paginate(7);
+//        dd($clients);
+
         $total = ClientUser::where(
             $where
         )->count();
-        $status = Client::$status;
+        $status = ClientUser::$status;
+//        dd($status);
+
 
         return view('client.index',[
             'clients'=>$clients,

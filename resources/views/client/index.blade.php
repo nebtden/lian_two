@@ -33,7 +33,7 @@
                                 <table id="client_index" class="table table-bordered table-hover" role="grid" >
                                     <thead>
                                     <tr role="row">
-                                        <th>ID</th>
+
                                         <th>姓名</th>
                                         <th>手机号码 </th>
                                         <th>状态</th>
@@ -44,9 +44,9 @@
                                     <tbody>
                                     @foreach($clients as $client)
                                         <tr role="row" class="odd">
-                                            <td >{{$client->id}}</td>
-                                            <td>{{$client->user_name}}</td>
-                                            <td>{{$client->phone}}</td>
+
+                                            <td>{{$client->client->user_name}}</td>
+                                            <td>{{$client->client->phone}}</td>
                                             <td>{{$status[$client->status]}}</td>
                                             <td>{{$client->created_at}}</td>
                                             <td><a href="{{ url('/user/client/'.$client->id.'/edit') }}">编辑</a></td>
