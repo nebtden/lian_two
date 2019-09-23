@@ -3,7 +3,8 @@
 namespace App\Admin\Controllers;
 
 
-use App\Models\Setting;
+use App\Models\AdminUser;
+use App\Models\Rule;
 use App\Models\User;
 use Encore\Admin\Auth\Permission;
 use Encore\Admin\Controllers\AdminController;
@@ -11,6 +12,7 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use Encore\Admin\Facades\Admin;
+use Illuminate\Support\Facades\Auth;
 
 class RuleController extends AdminController
 {
@@ -26,7 +28,7 @@ class RuleController extends AdminController
     protected function grid()
     {
         //超级管理员可以看到所有信息，销售只能看到自己的
-        $grid = new Grid(new Setting());
+        $grid = new Grid(new Rule());
         $isAdmin = Admin::user()->isRole('administrator');
         if(!$isAdmin){
             Permission::error();
@@ -44,7 +46,7 @@ class RuleController extends AdminController
      */
     protected function detail($id)
     {
-        $show = new Show(Setting::findOrFail($id));
+        $show = new Show(Rule::findOrFail($id));
 
         return $show;
     }
@@ -56,13 +58,19 @@ class RuleController extends AdminController
      */
     protected function form()
     {
-        $form = new Form(new Setting());
+        $form = new Form(new Rule());
 
-//        $form->display('id', __('ID'));
-//        $form->display('key','字段名(无法修改)');
-        $form->display('remark', '备注');
-        $form->textarea('value','配置值');
+        $form->text('name','配置值');
 
+        $form->hasMany('detail','规则', function (Form\NestedForm $form) {
+//            $form->text('title');
+            $admin = Admin::user();
+
+            $form->text('time_last');
+            $form->text('index');
+            $form->select('user_id', '销售')->rules('required')->options(User::all()->pluck('name', 'id'));
+//            $form->hidden('user_id')->value($admin->id);
+        });
 
         return $form;
     }

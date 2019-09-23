@@ -7,6 +7,7 @@ use App\Imports\ClientsImport;
 use App\Imports\UserClientsImport;
 use App\Jobs\ProcessEmail;
 use App\Models\Client;
+use App\Models\ClientUser;
 use App\Models\Setting;
 use App\Models\User;
 use http\Client\Response;
@@ -33,10 +34,10 @@ class ClientController extends Controller
         $where = [];
         $user_id = Auth::user()->id;
         $where['user_id'] = $user_id;
-        $clients =  Client::where(
+        $clients =  ClientUser::where(
             $where
-        )->orderBy('id','desc')->paginate(7);
-        $total = Client::where(
+        )->with('user')->orderBy('id','desc')->paginate(7);
+        $total = ClientUser::where(
             $where
         )->count();
         $status = Client::$status;

@@ -9,6 +9,9 @@ class RulesDetail extends Model
     // table name
     protected $table = 'rules_detail';
 
+    protected $fillable = [
+        'time_last', 'rule_id',  'index','user_id'
+    ];
 
 
 }
