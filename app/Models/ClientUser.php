@@ -14,9 +14,14 @@ class ClientUser extends Model
     ];
 
     public static $status = [
-        1=>'test1',
-        2=>'test2',
-        3=>'test3',
+        1=>'成交完成（核心业务）',
+        2=> '成交完成（基础业务）',
+        3=>'订单（核心业务） ',
+        4=>'订单（基础业务）',
+        5=>'战败同行',
+        6=>'数据已失效',
+        7=>'订单退单',
+        8=>'数据冲突 ',
     ];
 
     public function client(){

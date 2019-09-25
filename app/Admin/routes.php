@@ -13,4 +13,6 @@ Route::group([
     $router->get('/', 'HomeController@index')->name('admin.home');
     $router->resource('/clients', 'ClientController');
     $router->resource('/rules', 'RuleController');
+    $router->get('/clients-import/index', 'ClientsImportController@index')->name('clients-import');
+    $router->post('/clients-import', 'ClientsImportController@store');
 });

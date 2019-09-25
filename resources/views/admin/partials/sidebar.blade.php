@@ -42,8 +42,8 @@
             @if(Admin::user()->id==1)
             <li class="treeview">
                 <a href="#">
-                    <i class="fa fa-tasks"></i>
-                    <span>Admin</span>
+                    <i class="fa fa-user-o"></i>
+                    <span>管理员列表</span>
                     <i class="fa fa-angle-left pull-right"></i>
                 </a>
                 <ul class="treeview-menu">
@@ -51,7 +51,7 @@
                         $admins = \App\Models\AdminUser::all();
                         foreach($admins as $admin){
 
-                        echo "<li> <a href='/admin/clients?admin_user_id=$admin->id'> <i class='fa fa-users'></i> <span>$admin->username</span> </a> </li> ";
+                        echo "<li> <a href='/admin/clients?admin_user_id=$admin->id'> <i class='fa fa-user-o'></i> <span>$admin->username</span> </a> </li> ";
                         }
                     @endphp
                 </ul>

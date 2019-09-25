@@ -4,6 +4,7 @@ namespace App\Admin\Controllers;
 
 
 
+use App\Admin\Extensions\Tools\ClientsUpload;
 use App\Models\AdminUser;
 use App\Models\User;
 use Encore\Admin\Auth\Permission;
@@ -33,34 +34,35 @@ class ClientController extends AdminController
         Admin::disablePjax();
         Admin::js('/js/mychange.js');
 
-       Permission::check('clients');
+        Permission::check('clients');
+        $admin = Admin::user();
 
         //超级管理员可以看到所有信息，销售只能看到自己的
         $grid = new Grid(new Client());
+
+
         $grid->model()->setPerPage(60);
         $isAdmin = Admin::user()->isRole('administrator');
+        if($isAdmin){
+            $id = Request()->get('admin_user_id');
+            $grid->model()->where('admin_user_id',$id);
+        }else{
+            $grid->model()->where('admin_user_id',$admin->id);
+        }
         $isPutong = Admin::user()->isRole('putong');
-
-
         $grid->model()->orderBy('id', 'desc');
+
 
         $grid->column('id','ID')->sortable();
         $grid->column('user_name','姓名');
         $grid->column('phone','手机号码');
 
-        if($isAdmin or $isPutong){
 
-//            $grid->admin()->name('分配的销售顾问');
-//            $grid->upload()->name('数据上传者');
-            
-        }
-		$grid->column('status','订单状态')->display(function ($status){
-                return Client::$status[$status];
+        $grid->column('status','订单状态')->display(function ($status){
+            return Client::$status[$status];
         });
 
-//        $grid->column('admin_remark','管理员备注');
-//        $grid->column('remark','客户备注');
-//        $grid->column('sales_remark','销售备注');
+
         $grid->column('created_at', '创建时间');
         $grid->filter(function($filter){
 
@@ -70,45 +72,25 @@ class ClientController extends AdminController
             $filter->like('user_name', '客户名');
             $filter->equal('phone', '手机号');
             $filter->equal('status', '订单状态')->select(Client::$status);
-//            $filter->like('sales_remark', '销售备注');
-//            $filter->equal('sales_status', '销售状态')->select(Client::$sales_status);
-
-
-//                $admins = AdminUser::all()->pluck('name','id')->toArray();
-//                $admins[0]='无';
-//                $filter->equal('admin_user_id', '销售顾问')->select($admins);
-//                $filter->equal('user_id', '渠道商或外销经理')->select(User::all()->pluck('name','id'));
-//                $filter->equal('upload_admin_id', '上传者')->select(User::all()->pluck('name','id'));
 
 
             $filter->between('created_at', '创建时间')->datetime();
 
         });
 
-        if($isAdmin or $isPutong){
-//            $grid->top()->name('外拓经理');
-            $grid->actions(function ($actions) {
-                $actions->disableView();
-            });
-
-
-        }
-
-        if(!$isAdmin){
-            $grid->actions(function ($actions) {
-                $actions->disableDelete();
-                $actions->disableView();
-            });
-        }
+        $grid->actions(function ($actions) {
+            $actions->disableDelete();
+            $actions->disableView();
+        });
 
 
         $grid->tools(function ($tools)  {
+            $tools->append(new ClientsUpload());
             $tools->batch(function ($batch) {
                 $isAdmin = Admin::user()->isRole('administrator');
                 if(!$isAdmin){
                     $batch->disableDelete();
                 }
-
             });
         });
         return $grid;
@@ -178,11 +160,10 @@ class ClientController extends AdminController
         $admin = Admin::user();
         $isAdmin = $admin->isRole('administrator');
         $isPutong = $admin->isRole('putong');
-        $isXiaoshou = $admin->isRole('xiaoshou');
+//        $isXiaoshou = $admin->isRole('xiaoshou');
         $form->hidden('upload_admin_id')->value($admin->id);
         $form->hidden('user_id')->default(0);
         $form->hidden('id');
-        $form->hidden('transfer_remark');
 
 
         if($isAdmin){
@@ -225,9 +206,9 @@ class ClientController extends AdminController
             $form->select('sales_status','销售反馈')->options(Client::$sales_status);
             $form->textarea('sales_remark', '销售备注');
 
-                $form->hidden('admin_user_id', '指派所属销售去管理')
-                    ->rules('required')
-                    ->value($admin->id);
+            $form->hidden('admin_user_id', '指派所属销售去管理')
+                ->rules('required')
+                ->value($admin->id);
 
         }
 
