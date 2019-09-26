@@ -6,6 +6,7 @@ namespace App\Admin\Controllers;
 
 use App\Admin\Extensions\Tools\ClientsUpload;
 use App\Models\AdminUser;
+use App\Models\ClientUser;
 use App\Models\User;
 use Encore\Admin\Auth\Permission;
 use Encore\Admin\Facades\Admin;
@@ -43,25 +44,42 @@ class ClientController extends AdminController
 
         $grid->model()->setPerPage(60);
         $isAdmin = Admin::user()->isRole('administrator');
+        $isPutong = Admin::user()->isRole('putong');
         if($isAdmin){
             $id = Request()->get('admin_user_id');
             $grid->model()->where('admin_user_id',$id);
-        }else{
+        }elseif ($isPutong){
             $grid->model()->where('admin_user_id',$admin->id);
         }
-        $isPutong = Admin::user()->isRole('putong');
+
         $grid->model()->orderBy('id', 'desc');
 
 
         $grid->column('id','ID')->sortable();
         $grid->column('user_name','姓名');
         $grid->column('phone','手机号码');
-
-
-        $grid->column('status','订单状态')->display(function ($status){
-            return Client::$status[$status];
+        $grid->column('sales','销售列表')->display(function (){
+            $id = $this->id;
+            $client_users = ClientUser::where([
+                'client_id'=>$id
+            ])->with('user')->get();
+            $html  = ' ';
+            foreach($client_users as $value){
+                $html = $html . $value->user->name;
+                $html = $html . ' :';
+                $html = $html . $value->remark;
+                $html = $html . '<br>';
+            }
+            return $html;
         });
 
+        $grid->rule()->name('分配策略');
+
+
+        $grid->column('status','最终订单状态')->display(function ($status){
+            return Client::$status[$status];
+        });
+        $grid->user()->name('最终成交对象');
 
         $grid->column('created_at', '创建时间');
         $grid->filter(function($filter){
@@ -86,12 +104,7 @@ class ClientController extends AdminController
 
         $grid->tools(function ($tools)  {
             $tools->append(new ClientsUpload());
-            $tools->batch(function ($batch) {
-                $isAdmin = Admin::user()->isRole('administrator');
-                if(!$isAdmin){
-                    $batch->disableDelete();
-                }
-            });
+
         });
         return $grid;
 
@@ -110,34 +123,7 @@ class ClientController extends AdminController
         $show->field('id', __('ID'));
         $show->field('status', '状态');
         $show->field('remark', '备注');
-
-
         return $show;
-    }
-
-    public  function toAdmin(Request $request)
-    {
-        foreach (Client::find($request->get('ids')) as $client) {
-            $client->admin_user_id = $request->get('admin_user_id');
-            $client->save();
-        }
-    }
-
-
-    public  function adminRemark(Request $request)
-    {
-        foreach (Client::find($request->get('ids')) as $client) {
-            $client->admin_remark = $request->get('admin_remark');
-            $client->save();
-        }
-    }
-
-    public  function adminStatus(Request $request)
-    {
-        foreach (Client::find($request->get('ids')) as $client) {
-            $client->status = $request->get('admin_status');
-            $client->save();
-        }
     }
 
 
@@ -160,106 +146,38 @@ class ClientController extends AdminController
         $admin = Admin::user();
         $isAdmin = $admin->isRole('administrator');
         $isPutong = $admin->isRole('putong');
-//        $isXiaoshou = $admin->isRole('xiaoshou');
+
         $form->hidden('upload_admin_id')->value($admin->id);
-        $form->hidden('user_id')->default(0);
+//        $form->hidden('user_id')->default(0);
         $form->hidden('id');
 
 
-        if($isAdmin){
+        if($isAdmin or $isPutong){
             $form->text('phone', '电话号码')->required()->rules('unique:clients,phone,'.$id);
 
             $form->text('user_name', '姓名');
             $form->textarea('admin_remark', '管理员备注');
-            $form->select('admin_user_id', '指派所属销售去管理')->rules('required')->options(AdminUser::all()->pluck('name', 'id'));
-            $form->textarea('remark', '客户备注');
+//            $form->select('admin_user_id', '指派所属销售去管理')->rules('required')->options(AdminUser::all()->pluck('name', 'id'));
+//            $form->textarea('remark', '客户备注');
             $form->textarea('sales_remark', '销售备注');
             $form->textarea('transfer_remark', '客户交费进度');
             $form->select('status', '订单状态')->options(Client::$status)->required();
-            $form->select('sales_status','销售反馈')->options(Client::$sales_status);
-            $form->datetime('created_at','创建时间');
-        }
-
-        if($isPutong){
-            if($id){
-                $form->text('phone', '电话号码')->required()->rules('unique:clients,phone,'.$id)->disable();
-            }else{
-                $form->text('phone', '电话号码')->required()->rules('unique:clients,phone,'.$id);
-            }
-            $form->text('user_name', '姓名');
-            $form->textarea('admin_remark', '管理员备注');
-            $form->select('admin_user_id', '指派所属销售去管理')->rules('required')->options(AdminUser::all()->pluck('name', 'id'));
-            $form->textarea('remark', '客户备注');
-            $form->textarea('sales_remark', '销售备注');
-            $form->textarea('transfer_remark', '客户交费进度');
-            $form->select('status', '订单状态')->options(Client::$status)->required();
-            $form->select('sales_status','销售反馈')->options(Client::$sales_status);
-        }
-
-        if($isXiaoshou){
-            if($id){
-                $form->text('phone', '电话号码')->required()->rules('unique:clients,phone,'.$id)->disable();
-            }else{
-                $form->text('phone', '电话号码')->required()->rules('unique:clients,phone,'.$id);
-            }
-            $form->text('user_name', '姓名');
-            $form->select('sales_status','销售反馈')->options(Client::$sales_status);
-            $form->textarea('sales_remark', '销售备注');
-
-            $form->hidden('admin_user_id', '指派所属销售去管理')
-                ->rules('required')
-                ->value($admin->id);
+            $form->select('user_id', '最终成交公司')->options(User::all()->pluck('name','id'));
+//            $form->select('sales_status','销售反馈')->options(Client::$sales_status);
 
         }
+
 
         $form->saving(function ($form) {
             if(isset($form->phone)){
                 $form->phone = trim($form->phone);
             }
-            if(isset($form->status) && $form->status==3){
-                $form->sales_status= 2;
-            }
+
             $form->user_id= $form->user_id??0;
             if($form->status == 4){
-                //处理交易记录，检查记录是否添加
-                $transfer = Transfer::where([
-                    'client_id'=>$form->id
-                ])->first();
-                if($transfer){
-//
-                }else{
-                    if($form->user_id){
-                        $user = User::find($form->user_id);
-                        if($user->type!=4){
-                            $transfer = new Transfer();
-                            $transfer->client_id = $form->id;
-                            $transfer->user_id = $form->user_id;
-                            $transfer->status = 0;
-                            $transfer->user_type = 1;
-                            $transfer->remark = $form->transfer_remark;
-                            $transfer->save();
-
-                            if($user->parent_id){
-                                $parent = User::find($user->parent_id);
-                                if($parent->type==3){
-                                    $transfer = new Transfer();
-                                    $transfer->client_id = $form->id;
-                                    $transfer->user_id = $user->parent_id;
-                                    $transfer->status = 0;
-                                    $transfer->user_type = 2;
-                                    $transfer->remark =  $form->transfer_remark;
-                                    $transfer->save();
-                                }
-                            }
-                        }
-
-                    }
-                }
-
 
 
             }
-
         });
 
 

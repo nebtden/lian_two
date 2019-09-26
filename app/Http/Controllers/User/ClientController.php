@@ -30,6 +30,10 @@ class ClientController extends Controller
             return  view('abandon');
         }
 
+//        $client_users = ClientUser::where([
+//            'client_id'=>1
+//        ])->with('user')->get();
+
         //用户列表
         $where = [];
         $user_id = Auth::user()->id;
@@ -52,7 +56,35 @@ class ClientController extends Controller
         ]);
     }
 
+    public function edit($id){
+        //用户列表
+        $where = [];
+        $user_id = Auth::user()->id;
+        $where['user_id'] = $user_id;
+        $where['id'] = $id;
+        $client =  ClientUser::where(
+            $where
+        )->first();
 
+        return view('client.edit',[
+            'client'=>$client,
+            'statuses'=>ClientUser::$status,
+        ]);
+    }
+
+    public function update(Request $request){
+
+        $id = $request->get('id');
+        $client = ClientUser::findOrFail($id);
+
+        $client->status = $request->input('status');
+        $client->remark = $request->input('remark');
+        $client->save();
+        $id = $client->id;
+        $request->session()->flash('setting_status', '您的数据已更新');
+
+        return   redirect('/user/client/');
+    }
 
 
 
@@ -104,21 +136,6 @@ class ClientController extends Controller
     }
 
 
-
-    public function edit($id){
-        //用户列表
-        $where = [];
-        $user_id = Auth::user()->id;
-        $where['user_id'] = $user_id;
-        $where['id'] = $id;
-        $client =  Client::where(
-            $where
-        )->first();
-
-        return view('client.edit',[
-            'client'=>$client,
-        ]);
-    }
 
     public function show($id){
         //用户列表

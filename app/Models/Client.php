@@ -15,11 +15,21 @@ class Client extends Model
     ];
 
     public static  $status =[
-        1=>'跟踪中',
-        2=>'失效',
-        3=>'初步订单完成，正在走成交流程',
-        4=>'客户财务完成',
-        5=>'销售完成',
+        0=>'待核实成交',
+        1=>'成交（核心业务）',
+        2=>' 成交（基础业务）',
+        3=>'订单（核心业务）',
+        4=>'订单（基础业务）',
+        5=>'战败',
+        6=>'失效',
+        7=>'成交后退单',
+        8=>'数据冲突',
+        9=>'归属系统，成交',
+        10=>'归属系统，战败',
+        11=>'归属系统，失效',
+        12=>'无归属权，未核实成交',
+        13=>'无归属权，成交',
+        14=>'无归属权，失效',
     ];
 
 
@@ -51,6 +61,10 @@ class Client extends Model
 
     public function user(){
         return $this->belongsTo(User::class,'user_id');
+    }
+
+    public function rule(){
+        return $this->belongsTo(Rule::class,'rule_id');
     }
 
     public function top(){
