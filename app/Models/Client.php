@@ -32,6 +32,11 @@ class Client extends Model
         14=>'无归属权，失效',
     ];
 
+    public static $is_rule_stopped = [
+        0=>'启动',
+        1=>'关闭',
+    ];
+
 
     public static $sales_status = [
         0=>'跟踪中',

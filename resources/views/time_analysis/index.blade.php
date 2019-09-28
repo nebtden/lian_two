@@ -12,7 +12,7 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title">客户信息</h3>
+                    <h3 class="card-title">接收时间统计</h3>
                     <div class="card-tools">
 
                     </div>
@@ -42,7 +42,7 @@
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    @foreach($clients as $client)
+                                    @foreach($list as $value)
                                         <tr role="row" class="odd">
 
                                             <td>{{$client->client->user_name}}</td>
@@ -52,7 +52,6 @@
                                             <td>
                                                 <a class="client_accept" data-id="{{$client->id}}">接收</a>
                                                 <a href="{{ url('/user/client/'.$client->id.'/edit') }}">编辑</a></td>
-                                                <a href="{{ url('/user/client/'.$client->id.'/complain') }}">申诉</a></td>
                                         </tr>
                                     @endforeach
 
@@ -69,7 +68,7 @@
                             </div>
                             <div class="col-sm-12 col-md-7">
                                 <div class="dataTables_paginate paging_simple_numbers" id="example1_paginate">
-                                    {{ $clients->links() }}
+                                    {{ $list->links() }}
 
                                 </div>
                             </div>
@@ -93,7 +92,7 @@
 @stop
 
 @section('js')
-    <script src="/js/lian/accept.js"></script>
+
     <script>
         $('#client_index').DataTable({
             "bPaginate": false,

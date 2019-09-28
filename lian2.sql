@@ -5,7 +5,7 @@
  Source Server Type    : MariaDB
  Source Server Version : 100207
  Source Host           : localhost:3306
- Source Schema         : lian2
+ Source Schema         is_rule_stoped: lian2
 
  Target Server Type    : MariaDB
  Target Server Version : 100207

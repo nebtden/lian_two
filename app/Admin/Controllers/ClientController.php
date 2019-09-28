@@ -61,7 +61,8 @@ class ClientController extends AdminController
         $grid->column('sales','销售列表')->display(function (){
             $id = $this->id;
             $client_users = ClientUser::where([
-                'client_id'=>$id
+                ['client_id','=',$id],
+                ['status','>',0]
             ])->with('user')->get();
             $html  = ' ';
             foreach($client_users as $value){
@@ -74,12 +75,13 @@ class ClientController extends AdminController
         });
 
         $grid->rule()->name('分配策略');
+        $grid->column('is_rule_stopped','策略是否停止')->select(Client::$is_rule_stopped);
 
 
         $grid->column('status','最终订单状态')->display(function ($status){
             return Client::$status[$status];
         });
-        $grid->user()->name('最终成交对象');
+        $grid->user()->name('最终成交销售');
 
         $grid->column('created_at', '创建时间');
         $grid->filter(function($filter){

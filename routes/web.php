@@ -20,11 +20,15 @@ Auth::routes();
 Route::get('/home', 'HomeController@index')->name('home');
 
 Route::middleware(['auth'])->post('/user/client/accept', 'User\ClientController@accept');
+Route::middleware(['auth'])->any('/user/client/complain', 'User\ClientController@complain');
 Route::middleware(['auth'])->resource('/user/client', 'User\ClientController');
+Route::middleware(['auth'])->resource('/user/time-analysis', 'User\TimeAnalysisController');
+Route::middleware(['auth'])->resource('/user/result-analysis', 'User\ResultAnalysisController');
 Route::middleware(['auth'])->any('/user/setting', 'User\SettingController@index');
 //Route::post('/user/setting', 'User\SettingController@index');
 
-App::make('router')->get('/tests', function () {
+App::make('router')->get('
+/tests', function () {
     return 222;
 });
 Route::group(['middleware' => ['web']], function () {

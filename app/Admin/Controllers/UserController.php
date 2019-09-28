@@ -25,7 +25,7 @@ class UserController extends AdminController
      *
      * @var string
      */
-    protected $title = '销售登录';
+    protected $title = '销售管理';
 
     /**
      * Make a grid builder.
@@ -33,32 +33,9 @@ class UserController extends AdminController
      * @return Grid
      */
 
-    public function tree(){
-        Admin::js('/js/bootstrap-treeview.js');
-        Admin::js('/js/mytree.js');
-        $content = new Content();
-        return $content
-            ->title('渠道商列表')
-            ->description('可以搜索、可以展示...')
-            ->body(' 
- <div class="form-group row">
-        <div class="col-md-3"> 
-            <label for="input-select-node" class="sr-only">Search Tree:</label>
-            <input type="input" class="form-control" id="input-select-node" placeholder="输入渠道商姓名进行搜索"  > 
-            
-          </div>
-          <div class="col-md-3">
-              <button type="button" class="btn btn-success select-node" id="btn-select-node">搜索</button>
-          </div>
-          </div>
-           
-      <div id="tree"></div>');
-    }
-
     protected function grid()
     {
         Admin::disablePjax();
-//        Permission::check('users');
         $isXiaoshou = Admin::user()->isRole('xiaoshou');
         $isAdmin = Admin::user()->isRole('administrator');
         $isCaiwu = Admin::user()->isRole('caiwu');
@@ -66,56 +43,29 @@ class UserController extends AdminController
         if($isXiaoshou){
             Permission::error();
         }
+        $admin = Admin::user();
         $grid = new Grid(new User());
 
         $grid->model()->orderBy('id', 'desc');
         $grid->column('id','ID')->sortable();
         $grid->column('name','用户名');
+        $grid->column('phone','手机号码');
+
         if($isAdmin){
-            $grid->column('phone','手机号码');
-        }else{
-            $grid->column('phone','手机号码')->display(function ($value){
-                return substr($value,0,9).'**';
-            });
+//            $id = Request()->get('admin_user_id');
+//            $grid->model()->where('admin_user_id',$id);
+        }elseif ($isPutong){
+            $grid->model()->where('admin_user_id',$admin->id);
         }
 
-//        $grid->column('status','状态');
-        $grid->column('bank_name','银行');
-        $grid->column('card_number','卡号');
         $grid->column('remark','备注');
-//        $grid->image('remark','备注');
-
-        if($isPutong or $isAdmin){
-            $grid->invitaion_register_image('邀请下级注册链接')->display(function ($value){
-                if($this->type==1 or $this->type==2){
-                    return '';
-                }
-                return  '<img style="max-width:200px;max-height:200px" class="img img-thumbnail" src="'.$this->invitaion_register_image.'" >';
-            });
-            $grid->invitaion_client_image('邀请用户注册链接')->display(function ($value){
-
-                return  '<img style="max-width:200px;max-height:200px" class="img img-thumbnail" src="'.$this->invitaion_client_image.'" >';
-            });
-        }
-
-
 
         $grid->column('status','状态')->display(function ($status){
             return User::$status[$status];
         });
-        $grid->parent()->name('上级渠道商')->display(function ($value){
-            return "<a href='/admin/users?parent_id=$this->parent_id'>".$value."</a>";
-        });
-        $grid->top()->name('所属外拓经理')->display(function ($value){
-            return "<a href='/admin/users?top_parent_id=$this->top_parent_id'>".$value."</a>";
-        });
-        $grid->column('type','类型')->display(function ($type){
-            return User::$type[$type];
-        });
 
 
         $grid->column('created_at', '创建时间');
-//        $grid->column('updated_at', '更新时间');
         $grid->filter(function($filter){
 
             // 去掉默认的id过滤器
@@ -127,21 +77,17 @@ class UserController extends AdminController
             $filter->like('name', '客户名');
             $filter->equal('phone', '手机号');
             $filter->equal('status', '状态')->select(User::$status);
-            $filter->equal('type', '类型')->select(User::$type);
-            $filter->equal('parent_id', '直属外拓经理')->select(User::where(['status'=>1,'type'=>4])->get()->pluck('name','id'));
-            $filter->equal('top_parent_id', '源头外拓经理')->select(User::where(['status'=>1,'type'=>4])->get()->pluck('name','id'));
             $filter->between('created_at', '创建时间')->datetime();
 //            $filter->in('user_id', '经销商')->ajax('/admin/api/users');;
         });
-        $grid->disableRowSelector();
-        $grid->exporter(new UsersExport());
-        $grid->tools(function ($tools) {
-            $tools->append(new UsersUpload());
-        });
-        $grid->actions(function ($actions) {
-            $actions->disableDelete();
-//            $actions->disableView();
-        });
+//        $grid->disableRowSelector();
+//        $grid->exporter(new UsersExport());
+//        $grid->tools(function ($tools) {
+//            $tools->append(new UsersUpload());
+//        });
+//        $grid->actions(function ($actions) {
+//            $actions->disableDelete();
+//        });
 
         return $grid;
     }

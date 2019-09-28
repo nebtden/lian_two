@@ -52,7 +52,6 @@
                                             <td>
                                                 <a class="client_accept" data-id="{{$client->id}}">接收</a>
                                                 <a href="{{ url('/user/client/'.$client->id.'/edit') }}">编辑</a></td>
-                                                <a href="{{ url('/user/client/'.$client->id.'/complain') }}">申诉</a></td>
                                         </tr>
                                     @endforeach
 
