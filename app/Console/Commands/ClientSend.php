@@ -2,6 +2,7 @@
 namespace App\Console\Commands;
 
 use App\Models\Client;
+use App\Models\ClientUser;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
@@ -37,8 +38,11 @@ class ClientSend extends Command
     {
 
         //查看规则，是否满足需求
-        for
-
+        ClientUser::where([
+            ['status','=',-1],
+        ])->whereColumn('effect_at', '<', 'created_at')->update([
+            'status'=>0
+        ]);
 
         $this->info('测试成功！');
         return ;

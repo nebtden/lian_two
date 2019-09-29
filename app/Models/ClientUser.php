@@ -14,6 +14,8 @@ class ClientUser extends Model
     ];
 
     public static $status = [
+        -1=>'数据没生效',
+        0=>'数据刚分配',
         1=>'成交完成（核心业务）',
         2=> '成交完成（基础业务）',
         3=>'订单（核心业务） ',

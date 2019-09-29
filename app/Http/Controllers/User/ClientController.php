@@ -38,6 +38,7 @@ class ClientController extends Controller
         $where = [];
         $user_id = Auth::user()->id;
         $where['user_id'] = $user_id;
+        $where['status'] = 0;
         $clients =  ClientUser::where(
             $where
         )->with('client')->orderBy('id','desc')->paginate(7);

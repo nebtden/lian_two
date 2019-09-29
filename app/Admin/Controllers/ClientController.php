@@ -7,6 +7,8 @@ namespace App\Admin\Controllers;
 use App\Admin\Extensions\Tools\ClientsUpload;
 use App\Models\AdminUser;
 use App\Models\ClientUser;
+use App\Models\Rule;
+use App\Models\RulesDetail;
 use App\Models\User;
 use Encore\Admin\Auth\Permission;
 use Encore\Admin\Facades\Admin;
@@ -156,16 +158,13 @@ class ClientController extends AdminController
 
         if($isAdmin or $isPutong){
             $form->text('phone', '电话号码')->required()->rules('unique:clients,phone,'.$id);
-
             $form->text('user_name', '姓名');
             $form->textarea('admin_remark', '管理员备注');
-//            $form->select('admin_user_id', '指派所属销售去管理')->rules('required')->options(AdminUser::all()->pluck('name', 'id'));
-//            $form->textarea('remark', '客户备注');
             $form->textarea('sales_remark', '销售备注');
             $form->textarea('transfer_remark', '客户交费进度');
             $form->select('status', '订单状态')->options(Client::$status)->required();
-            $form->select('user_id', '最终成交公司')->options(User::all()->pluck('name','id'));
-//            $form->select('sales_status','销售反馈')->options(Client::$sales_status);
+            $form->select('rule_id', '策略选择')->options(Rule::all()->pluck('name','id'))->required();
+            $form->select('user_id', '最终成交公司')->options(User::all()->pluck('name','id'))->required();
 
         }
 
@@ -175,12 +174,31 @@ class ClientController extends AdminController
                 $form->phone = trim($form->phone);
             }
 
-            $form->user_id= $form->user_id??0;
-            if($form->status == 4){
+            //规则分配
+            $rule_id = $form->rule_id;
+            $details = RulesDetail::where([
+                'rule_id'=>$rule_id
+            ])->all();
 
+            //根据规则，增加，添加到系统里面
+            foreach ($details as $detail){
+                $user_id = $detail->user_id;
+                $client_id = $form->id;
+
+                $client_user = new ClientUser();
+                $client_user->client_id = $client_id;
+                $client_user->user_id = $user_id;
+                $client_user->status = -1;
+                $client_user->effect_at = date('Y-m-d H:i:s',time()+$detail->time_last*3600);
+                $client_user->save();
 
             }
+
+            //当有数据成交时，根据
+
+
         });
+
 
 
 
