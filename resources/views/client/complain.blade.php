@@ -3,7 +3,7 @@
 @section('title', 'Dashboard')
 
 @section('content_header')
-    <h1>信息申诉</h1>
+    <h1>申诉</h1>
 @stop
 
 @section('content')
@@ -29,13 +29,13 @@
 
                 <div class="card-body">
 
-                    <form  method="POST" action="{{ url('/user/client/'.$client->id) }}">
-                        <input name="_method" type="hidden" value="PUT">
+                    <form  method="POST" action="{{ url('/user/client/'.$client->id.'/complain') }}" enctype="multipart/form-data" accept-charset="UTF-8">
+                        {{--<input name="_method" type="hidden" value="PUT">--}}
                         <input type="hidden" name="id" value="{{$client->id}}" >
 
                         @csrf
 
-                        <div class="form-group">
+{{--                        <div class="form-group">
                             <label for="name"  >状态</label>
 
                             <div class="col-md-6">
@@ -45,15 +45,28 @@
                                     @endforeach
                                 </select>
                             </div>
-                        </div>
+                        </div>--}}
 
 
                         <div class="form-group">
-                            <label for="name"  >备注(便于自己查看)</label>
+                            <label for="name"  >申诉理由</label>
 
                             <div class="col-md-6">
-                                <textarea name="remark" class="form-control" rows="5"> {{old('remark')??$client->remark}}</textarea>
+                                <textarea name="complain_remark" class="form-control" rows="5"> {{old('remark')??$client->remark}}</textarea>
 
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="complain_file"  >申诉文件</label>
+                            <div class="col-md-6">
+                                <input id="complain_file" type="file"   class="form-control @error('complain_file') is-invalid @enderror" name="complain_file" value="{{ old('complain_file')?? '' }}" required  >
+
+                                @error('complain_file')
+                                <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
                             </div>
                         </div>
 

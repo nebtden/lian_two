@@ -26,6 +26,12 @@ class ClientUser extends Model
         8=>'数据冲突 ',
     ];
 
+    public  static $complain_status = [
+        0=>'未申诉',
+        1=>'开始申诉',
+        2=>'申诉完成',
+    ];
+
     public function client(){
         return $this->belongsTo(Client::class,'client_id');
     }

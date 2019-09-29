@@ -51,8 +51,11 @@
                                             <td>{{$client->created_at}}</td>
                                             <td>
                                                 <a class="client_accept" data-id="{{$client->id}}">接收</a>
-                                                <a href="{{ url('/user/client/'.$client->id.'/edit') }}">编辑</a></td>
-                                                <a href="{{ url('/user/client/'.$client->id.'/complain') }}">申诉</a></td>
+                                                <a href="{{ url('/user/client/'.$client->id.'/edit') }}">编辑</a>
+                                                @if(in_array($client->client->status,[1,2]) and $client->client->user_id !=$client->user_id)
+                                                    <a href="{{ url('/user/client/'.$client->id.'/complain') }}">申诉</a>
+                                                @endif
+                                            </td>
                                         </tr>
                                     @endforeach
 

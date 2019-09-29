@@ -20,7 +20,7 @@ Auth::routes();
 Route::get('/home', 'HomeController@index')->name('home');
 
 Route::middleware(['auth'])->post('/user/client/accept', 'User\ClientController@accept');
-Route::middleware(['auth'])->any('/user/client/complain', 'User\ClientController@complain');
+Route::middleware(['auth'])->any('/user/client/{id}/complain', 'User\ClientController@complain');
 Route::middleware(['auth'])->resource('/user/client', 'User\ClientController');
 Route::middleware(['auth'])->resource('/user/time-analysis', 'User\TimeAnalysisController');
 Route::middleware(['auth'])->resource('/user/result-analysis', 'User\ResultAnalysisController');

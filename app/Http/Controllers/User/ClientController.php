@@ -30,15 +30,13 @@ class ClientController extends Controller
             return  view('abandon');
         }
 
-//        $client_users = ClientUser::where([
-//            'client_id'=>1
-//        ])->with('user')->get();
 
         //用户列表
         $where = [];
         $user_id = Auth::user()->id;
-        $where['user_id'] = $user_id;
-        $where['status'] = 0;
+        $where[] =['user_id','=',$user_id];
+        $where[] =['status','>',0];
+
         $clients =  ClientUser::where(
             $where
         )->with('client')->orderBy('id','desc')->paginate(7);
@@ -47,7 +45,6 @@ class ClientController extends Controller
             $where
         )->count();
         $status = ClientUser::$status;
-
 
 
         return view('client.index',[
@@ -71,6 +68,39 @@ class ClientController extends Controller
             'client'=>$client,
             'statuses'=>ClientUser::$status,
         ]);
+    }
+
+
+    public function complain(Request $request,$id){
+        $user_id = Auth::user()->id;
+        $where = [];
+
+        $where['user_id'] = $user_id;
+        $where['id'] = $id;
+        $client =  ClientUser::where(
+            $where
+        )->first();
+        //系统更新
+        if($request->post()){
+            $file = $request->file('complain_file')->store('complain');
+            $client->complain_file = $file;
+            $client->complain_remark = $request->post('complain_remark');
+            $client->complain_time = date('Y-m-d H:i:s',time());
+            $client->save();
+
+        }else{
+            //用户列表
+
+            $client =  ClientUser::where(
+                $where
+            )->first();
+
+            return view('client.complain',[
+                'client'=>$client,
+                'statuses'=>ClientUser::$complain_status,
+            ]);
+        }
+
     }
 
     public function update(Request $request){

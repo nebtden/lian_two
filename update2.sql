@@ -1,5 +1,5 @@
 ALTER TABLE `lian2`.`clients` 
-CHANGE COLUMN `is_rule_stoped` `is_rule_stopped` tinyint(1) NOT NULL DEFAULT 0 AFTER `user_id`
+CHANGE COLUMN `is_rule_stoped` `is_rule_stopped` tinyint(1) NOT NULL DEFAULT 0 AFTER `user_id`;
 
 
 ALTER TABLE `lian2`.`users`
