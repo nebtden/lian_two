@@ -34,16 +34,18 @@ class ClientController extends Controller
         //用户列表
         $where = [];
         $user_id = Auth::user()->id;
-        $where[] =['user_id','=',$user_id];
-        $where[] =['status','>',0];
+        $where[] =['clients_users.user_id','=',$user_id];
+        $where[] =['clients_users.status','>',0];
+        $where[] =['clients.is_rule_stopped','=',0];
 
+//        >leftJoin('posts', 'users.id', '=', 'posts.user_id')
         $clients =  ClientUser::where(
             $where
-        )->with('client')->orderBy('id','desc')->paginate(7);
+        )->leftJoin('clients','clients_users.client_id','=','clients.id')->with('client')->orderBy('clients_users.id','desc')->paginate(7);
 
         $total = ClientUser::where(
             $where
-        )->count();
+        )->leftJoin('clients','clients_users.client_id','=','clients.id')->count();
         $status = ClientUser::$status;
 
 

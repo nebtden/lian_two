@@ -13,7 +13,13 @@ class ClientUser extends Model
         'client_id', 'user_id','status',
     ];
 
+    public static $is_open = [
+        1=>'开启',
+        0=>'关闭',
+    ];
+
     public static $status = [
+        -2=>'策略停止',
         -1=>'数据没生效',
         0=>'数据刚分配',
         1=>'成交完成（核心业务）',

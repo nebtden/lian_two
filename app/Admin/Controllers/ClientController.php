@@ -77,8 +77,11 @@ class ClientController extends AdminController
         });
 
         $grid->rule()->name('分配策略');
-        $grid->column('is_rule_stopped','策略是否停止')->select(Client::$is_rule_stopped);
+      $grid->column('is_rule_stopped','策略是否停止')->select(Client::$is_rule_stopped);
 
+//        $grid->column('is_rule_stopped','策略是否停止')->display(function ($status){
+//            return Client::$is_rule_stopped[$status];
+//        });
 
         $grid->column('status','最终订单状态')->display(function ($status){
             return Client::$status[$status];
@@ -164,6 +167,7 @@ class ClientController extends AdminController
             $form->textarea('transfer_remark', '客户交费进度');
             $form->select('status', '订单状态')->options(Client::$status)->required();
             $form->select('rule_id', '策略选择')->options(Rule::all()->pluck('name','id'))->required();
+            $form->select('is_rule_stopped', '策略是否停止')->options(Client::$is_rule_stopped)->required();
             $form->select('user_id', '最终成交公司')->options(User::all()->pluck('name','id'))->required();
 
         }
@@ -173,26 +177,52 @@ class ClientController extends AdminController
             if(isset($form->phone)){
                 $form->phone = trim($form->phone);
             }
+            $old_rule_id = $form->model()->rule_id;
 
-            //规则分配
-            $rule_id = $form->rule_id;
-            $details = RulesDetail::where([
-                'rule_id'=>$rule_id
-            ])->all();
+            //检测规则是否一样
+            $new_rule_id = $form->rule_id;
+            if($new_rule_id!=$old_rule_id){
+                //停止之前的规则 @todo
 
-            //根据规则，增加，添加到系统里面
-            foreach ($details as $detail){
-                $user_id = $detail->user_id;
-                $client_id = $form->id;
+                ClientUser::where([
+                    'rule_id'=>$old_rule_id
+                ])->update([
+                    'status'=>-2
+                ]);
 
-                $client_user = new ClientUser();
-                $client_user->client_id = $client_id;
-                $client_user->user_id = $user_id;
-                $client_user->status = -1;
-                $client_user->effect_at = date('Y-m-d H:i:s',time()+$detail->time_last*3600);
-                $client_user->save();
+                //根据规则，增加，添加到系统里面
+                $details = RulesDetail::where([
+                    'rule_id'=>$new_rule_id
+                ])->get();
 
+                foreach ($details as $detail){
+                    $user_id = $detail->user_id;
+                    $client_id = $form->id;
+
+                    $client_user = new ClientUser();
+                    $client_user->client_id = $client_id;
+                    $client_user->user_id = $user_id;
+                    $client_user->status = -1;
+                    $client_user->effect_at = date('Y-m-d H:i:s',time()+$detail->time_last*3600);
+                    $client_user->save();
+
+                }
             }
+
+            //策略是否停止
+//            if($form->is_rule_stopped){
+//                ClientUser::where([
+//                    'rule_id'=>$new_rule_id
+//                ])->update([
+//                    'status'=>-2
+//                ]);
+//            }else{
+//
+//            }
+
+
+
+
 
             //当有数据成交时，根据
 

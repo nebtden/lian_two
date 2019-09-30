@@ -60,9 +60,6 @@ class Client extends Model
         return $this->belongsTo(AdminUser::class,'admin_user_id');
     }
 
-    public function upload(){
-        return $this->belongsTo(AdminUser::class,'upload_admin_id');
-    }
 
     public function user(){
         return $this->belongsTo(User::class,'user_id');
@@ -70,10 +67,6 @@ class Client extends Model
 
     public function rule(){
         return $this->belongsTo(Rule::class,'rule_id');
-    }
-
-    public function top(){
-        return $this->belongsTo(User::class,'top_parent_id');
     }
 
 

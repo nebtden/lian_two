@@ -37,14 +37,27 @@ class ClientSend extends Command
     public function handle()
     {
 
-        //查看规则，是否满足需求
+        //不管策略是否生效，都更新时间查看规则，是否满足需求
         ClientUser::where([
             ['status','=',-1],
         ])->whereColumn('effect_at', '<', 'created_at')->update([
             'status'=>0
         ]);
 
-        $this->info('测试成功！');
+        //发送短信,如果是
+        $where = [];
+
+        $where[] =['clients_users.status','=',-1];
+        $where[] =['clients.user_id','>',0];  //对于确定了的用户，
+
+//        >leftJoin('posts', 'users.id', '=', 'posts.user_id')
+        $clients =  ClientUser::where(
+            $where
+        )->leftJoin('clients','clients_users.client_id','=','clients.id')->with('client')->orderBy('clients_users.id','desc')->paginate(7);
+
+
+
+
         return ;
     }
 }
