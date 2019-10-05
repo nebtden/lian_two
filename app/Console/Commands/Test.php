@@ -37,6 +37,9 @@ class Test extends Command
 
         //不管策略是否生效，都更新时间查看规则，是否满足需求
         $this->info('test');
+        $test  = new \App\Models\Test();
+//        $client_user->client_id = $client_id;
+        $test->save();
 
         return ;
     }

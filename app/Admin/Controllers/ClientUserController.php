@@ -120,47 +120,19 @@ class ClientUserController extends AdminController
         if($isAdmin or $isPutong){
 
             $form->display('remark', '销售备注');
-            $form->display('complain_remark', '申诉备注');
+            $form->textarea('complain_remark', '申诉备注')->disable();
             $form->select('complain_status', '申诉状态')->options(ClientUser::$complain_status)->required();
             $form->html(function ($form){
                 return '<a href="'.$form->model()->complain_file.'">'.$form->model()->complain_file.'</a>';
             }, '申诉文件');
-//            $form->display('remark', '销售备注');
 
             $form->select('status', '销售状态')->options(ClientUser::$status)->disable();
             $form->textarea('complain_reply', '申诉回复');
-//            $form->select('rule_id', '策略选择')->options(Rule::all()->pluck('name','id'))->required();
-//            $form->select('user_id', '最终成交公司')->options(User::all()->pluck('name','id'))->required();
 
         }
 
 
         $form->saving(function ($form) {
-            if(isset($form->phone)){
-                $form->phone = trim($form->phone);
-            }
-
-            //规则分配
-            $rule_id = $form->rule_id;
-            $details = RulesDetail::where([
-                'rule_id'=>$rule_id
-            ])->all();
-
-            //根据规则，增加，添加到系统里面
-            foreach ($details as $detail){
-                $user_id = $detail->user_id;
-                $client_id = $form->id;
-
-                $client_user = new ClientUser();
-                $client_user->client_id = $client_id;
-                $client_user->user_id = $user_id;
-                $client_user->status = -1;
-                $client_user->effect_at = date('Y-m-d H:i:s',time()+$detail->time_last*3600);
-                $client_user->save();
-
-            }
-
-            //当有数据成交时，根据
 
 
         });
