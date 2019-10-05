@@ -27,6 +27,8 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command('client_send')
             ->everyMinute();
+        $schedule->command('test')
+            ->everyMinute();
     }
 
     /**
