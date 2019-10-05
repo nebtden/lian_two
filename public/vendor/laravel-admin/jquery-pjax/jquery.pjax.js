@@ -907,6 +907,7 @@ function enable() {
     maxCacheLength: 20,
     version: findVersion
   }
+    $.pjax.disable();
   $(window).on('popstate.pjax', onPjaxPopstate)
 }
 

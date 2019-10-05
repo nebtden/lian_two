@@ -48,21 +48,12 @@ class ClientsImport implements ToModel, WithHeadingRow
         }
 
         $admin_user_id = 0;
-        if(isset($row['admin']) and $row['admin']){
-            $admin = AdminUser::where([
-                'name'=>$row['admin']
-            ])->first();
-            if($admin){
-                $admin_user_id = $admin->id;
-            }else{
-                throw  new \Exception($row['admin'].'销售顾问不在系统中，导入失败！');
-            }
-        }
 
-        $status = (int)$row['status'];
-        if(!in_array($status,[1,2,3,4,5])){
-            throw  new \Exception($row['status'].'状态不在系统中，导入失败！');
-        }
+
+//        $status = (int)$row['status'];
+//        if(!in_array($status,[1,2,3,4,5])){
+//            throw  new \Exception($row['status'].'状态不在系统中，导入失败！');
+//        }
 
         $user_id = 0;
 //        if(isset($row['user']) and $row['user']){
@@ -83,12 +74,12 @@ class ClientsImport implements ToModel, WithHeadingRow
             'admin_remark'    => $row['admin_remark']??'',
             'transfer_remark' => $row['transfer_remark']??'',
             'sales_remark'    => $row['sales_remark']??'',
-            'sales_status'    => $row['sales_status']??1,
-            'status'        => $status,
+//            'sales_status'    => $row['sales_status']??1,
+//            'status'        => $status,
             'created_at'        => $created_at,
-            'admin_user_id'     =>$admin_user_id,
-            'upload_admin_id' => $now_admin->id,
-            'user_id'     =>$user_id,
+            'admin_user_id'     =>$now_admin->id,
+            'upload_admin_id'   => $now_admin->id,
+
         ];
 
 

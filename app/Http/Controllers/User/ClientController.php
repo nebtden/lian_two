@@ -36,6 +36,7 @@ class ClientController extends Controller
         $user_id = Auth::user()->id;
         $where[] =['clients_users.user_id','=',$user_id];
         $where[] =['clients_users.status','>',0];
+//        $where[] =['clients_users.status','>',0];
         $where[] =['clients.is_rule_stopped','=',0];
 
 //        >leftJoin('posts', 'users.id', '=', 'posts.user_id')

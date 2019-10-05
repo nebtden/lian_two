@@ -30,3 +30,6 @@ CREATE TABLE `users_time_analyses` (
 
 ALTER TABLE `lian2`.`clients_users`
 ADD COLUMN `complain_remark` varchar(255) NULL COMMENT '销售说明' AFTER `remark`;
+
+ALTER TABLE `lian2`.`clients`
+ADD COLUMN `rule_start_time` timestamp(0) NULL COMMENT '指定规则时间' AFTER `rule_id`;

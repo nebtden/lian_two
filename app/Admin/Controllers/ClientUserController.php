@@ -16,6 +16,7 @@ use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
 use App\Models\Client;
+use function foo\func;
 use Illuminate\Http\Request;
 
 class ClientUserController extends AdminController
@@ -54,15 +55,14 @@ class ClientUserController extends AdminController
 
         $grid->column('id','ID')->sortable();
 
-        $grid->column('status','最终订单状态')->display(function ($status){
-            return Client::$status[$status];
+        $grid->column('status','销售状态')->display(function ($status){
+            return ClientUser::$status[$status];
         });
 
         $grid->column('created_at', '创建时间');
+        $grid->column('accepted_at', '接受');
         $grid->filter(function($filter){
-
             $filter->disableIdFilter();
-
         });
 
         $grid->actions(function ($actions) {
@@ -88,7 +88,7 @@ class ClientUserController extends AdminController
     protected function detail($id)
     {
 
-        $show = new Show(Client::findOrFail($id));
+        $show = new Show(ClientUser::findOrFail($id));
         $show->field('id', __('ID'));
         $show->field('status', '状态');
         $show->field('remark', '备注');
@@ -105,7 +105,7 @@ class ClientUserController extends AdminController
     protected function form($id)
     {
 
-        $form = new Form(new Client);
+        $form = new Form(new ClientUser());
         $form->tools(function (Form\Tools $tools) {
             $tools->disableDelete();
             $tools->disableView();
@@ -115,21 +115,22 @@ class ClientUserController extends AdminController
         $admin = Admin::user();
         $isAdmin = $admin->isRole('administrator');
         $isPutong = $admin->isRole('putong');
-
-        $form->hidden('upload_admin_id')->value($admin->id);
-//        $form->hidden('user_id')->default(0);
         $form->hidden('id');
 
-
         if($isAdmin or $isPutong){
-            $form->text('phone', '电话号码')->required()->rules('unique:clients,phone,'.$id);
-            $form->text('user_name', '姓名');
-            $form->textarea('admin_remark', '管理员备注');
-            $form->textarea('sales_remark', '销售备注');
-            $form->textarea('transfer_remark', '客户交费进度');
-            $form->select('status', '订单状态')->options(Client::$status)->required();
-            $form->select('rule_id', '策略选择')->options(Rule::all()->pluck('name','id'))->required();
-            $form->select('user_id', '最终成交公司')->options(User::all()->pluck('name','id'))->required();
+
+            $form->display('remark', '销售备注');
+            $form->display('complain_remark', '申诉备注');
+            $form->select('complain_status', '申诉状态')->options(ClientUser::$complain_status)->required();
+            $form->html(function ($form){
+                return '<a href="'.$form->model()->complain_file.'">'.$form->model()->complain_file.'</a>';
+            }, '申诉文件');
+//            $form->display('remark', '销售备注');
+
+            $form->select('status', '销售状态')->options(ClientUser::$status)->disable();
+            $form->textarea('complain_reply', '申诉回复');
+//            $form->select('rule_id', '策略选择')->options(Rule::all()->pluck('name','id'))->required();
+//            $form->select('user_id', '最终成交公司')->options(User::all()->pluck('name','id'))->required();
 
         }
 

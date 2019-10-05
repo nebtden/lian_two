@@ -5,7 +5,6 @@ namespace App\Admin\Controllers;
 
 
 use App\Admin\Extensions\Tools\ClientsUpload;
-use App\Models\AdminUser;
 use App\Models\ClientUser;
 use App\Models\Rule;
 use App\Models\RulesDetail;
@@ -35,7 +34,6 @@ class ClientController extends AdminController
     protected function grid()
     {
         Admin::disablePjax();
-        Admin::js('/js/mychange.js');
 
         Permission::check('clients');
         $admin = Admin::user();
@@ -49,7 +47,9 @@ class ClientController extends AdminController
         $isPutong = Admin::user()->isRole('putong');
         if($isAdmin){
             $id = Request()->get('admin_user_id');
-            $grid->model()->where('admin_user_id',$id);
+            if($id){
+                $grid->model()->where('admin_user_id',$id);
+            }
         }elseif ($isPutong){
             $grid->model()->where('admin_user_id',$admin->id);
         }
@@ -68,7 +68,10 @@ class ClientController extends AdminController
             ])->with('user')->get();
             $html  = ' ';
             foreach($client_users as $value){
-                $html = $html . $value->user->name;
+                $user_id = $value->id;
+                $html = $html ."<a href='/admin/clients-users/$user_id/edit'>".$value->user->name."</a>";
+                $html = $html . ' :';
+                $html = $html .ClientUser::$status[$value->status];
                 $html = $html . ' :';
                 $html = $html . $value->remark;
                 $html = $html . '<br>';
@@ -77,7 +80,9 @@ class ClientController extends AdminController
         });
 
         $grid->rule()->name('分配策略');
-      $grid->column('is_rule_stopped','策略是否停止')->select(Client::$is_rule_stopped);
+        $grid->column('rule_id','分配策略')->select(Rule::all()->pluck('name','id'));
+
+        $grid->column('is_rule_stopped','策略是否停止')->select(Client::$is_rule_stopped);
 
 //        $grid->column('is_rule_stopped','策略是否停止')->display(function ($status){
 //            return Client::$is_rule_stopped[$status];
@@ -163,12 +168,13 @@ class ClientController extends AdminController
             $form->text('phone', '电话号码')->required()->rules('unique:clients,phone,'.$id);
             $form->text('user_name', '姓名');
             $form->textarea('admin_remark', '管理员备注');
-            $form->textarea('sales_remark', '销售备注');
-            $form->textarea('transfer_remark', '客户交费进度');
+//            $form->textarea('sales_remark', '销售备注');
+//            $form->textarea('transfer_remark', '客户交费进度');
             $form->select('status', '订单状态')->options(Client::$status)->required();
+            $form->select('user_id', '最终成交销售')->options(User::all()->pluck('name','id'))->required();
             $form->select('rule_id', '策略选择')->options(Rule::all()->pluck('name','id'))->required();
             $form->select('is_rule_stopped', '策略是否停止')->options(Client::$is_rule_stopped)->required();
-            $form->select('user_id', '最终成交公司')->options(User::all()->pluck('name','id'))->required();
+
 
         }
 
@@ -181,11 +187,12 @@ class ClientController extends AdminController
 
             //检测规则是否一样
             $new_rule_id = $form->rule_id;
-            if($new_rule_id!=$old_rule_id){
+            if($new_rule_id && $new_rule_id!=$old_rule_id){
                 //停止之前的规则 @todo
 
                 ClientUser::where([
-                    'rule_id'=>$old_rule_id
+                    'rules_id'=>$old_rule_id,
+                    'client_id'=>$form->model()->id,
                 ])->update([
                     'status'=>-2
                 ]);
@@ -197,7 +204,7 @@ class ClientController extends AdminController
 
                 foreach ($details as $detail){
                     $user_id = $detail->user_id;
-                    $client_id = $form->id;
+                    $client_id = $form->model()->id;
 
                     $client_user = new ClientUser();
                     $client_user->client_id = $client_id;
@@ -210,17 +217,6 @@ class ClientController extends AdminController
             }
 
             //策略是否停止
-//            if($form->is_rule_stopped){
-//                ClientUser::where([
-//                    'rule_id'=>$new_rule_id
-//                ])->update([
-//                    'status'=>-2
-//                ]);
-//            }else{
-//
-//            }
-
-
 
 
 

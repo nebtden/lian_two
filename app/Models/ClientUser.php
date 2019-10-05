@@ -13,13 +13,14 @@ class ClientUser extends Model
         'client_id', 'user_id','status',
     ];
 
+    //在列表页里面控制，临时停止
     public static $is_open = [
         1=>'开启',
         0=>'关闭',
     ];
 
     public static $status = [
-        -2=>'策略停止',
+        -2=>'策略停止', //永久停止
         -1=>'数据没生效',
         0=>'数据刚分配',
         1=>'成交完成（核心业务）',
@@ -30,6 +31,14 @@ class ClientUser extends Model
         6=>'数据已失效',
         7=>'订单退单',
         8=>'数据冲突 ',
+    ];
+
+    public static $sales_status = [
+        0=>'跟踪中',
+        -1=>'失效',
+        -2=>'战败',
+        1=>'初步订单',
+        2=>'订单完成',
     ];
 
     public  static $complain_status = [
