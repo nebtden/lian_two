@@ -33,3 +33,7 @@ ADD COLUMN `complain_remark` varchar(255) NULL COMMENT '销售说明' AFTER `rem
 
 ALTER TABLE `lian2`.`clients`
 ADD COLUMN `rule_start_time` timestamp(0) NULL COMMENT '指定规则时间' AFTER `rule_id`;
+
+-- 10月5号创建
+ALTER TABLE `lian2`.`rules`
+ADD COLUMN `admin_user_id` int(11) NULL DEFAULT 0 AFTER `name`;

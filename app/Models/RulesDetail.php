@@ -13,5 +13,9 @@ class RulesDetail extends Model
         'time_last', 'rule_id',  'index','user_id'
     ];
 
+    public function Rule(){
+        return $this->belongsTo(Rule::class);
+    }
+
 
 }

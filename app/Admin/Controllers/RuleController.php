@@ -29,10 +29,10 @@ class RuleController extends AdminController
     {
         //超级管理员可以看到所有信息，销售只能看到自己的
         $grid = new Grid(new Rule());
-        $isAdmin = Admin::user()->isRole('administrator');
-        if(!$isAdmin){
-            Permission::error();
-        }
+//        $isAdmin = Admin::user()->isRole('administrator');
+//        if(!$isAdmin){
+//            Permission::error();
+//        }
         $grid->name('规则名');
 
         return $grid;
@@ -66,9 +66,9 @@ class RuleController extends AdminController
 //            $form->text('title');
             $admin = Admin::user();
 
-            $form->text('time_last');
-            $form->text('index');
-            $form->select('user_id', '销售')->rules('required')->options(User::all()->pluck('name', 'id'));
+            $form->text('time_last','时间间隔（数字）');
+            $form->text('index','排序');
+            $form->select('user_id', '销售')->options(User::all()->pluck('name', 'id'));
 //            $form->hidden('user_id')->value($admin->id);
         });
 
